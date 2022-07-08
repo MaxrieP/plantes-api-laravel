@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Country;
+use App\Models\Plant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,15 @@ class CountryController extends Controller
      */
     public function index()
     {
+        //Récupération pays
         $countries = DB::table('countries')
+            ->get()
+            ->toArray();
+
+        //Récupération plantes
+        $plants = DB::table('plants')
+            ->join('countries', 'plants.countryId', '=', 'countries.id')
+            ->select('plants.$', 'countries.countryName')
             ->get()
             ->toArray();
 
@@ -40,11 +49,6 @@ class CountryController extends Controller
 
         $country = Country::create([
             'countryName' => $request->countryName
-        ]);
-
-        return response()->json([
-            'status' => 'Pays ajouté',
-            'data' => $country
         ]);
     }
 

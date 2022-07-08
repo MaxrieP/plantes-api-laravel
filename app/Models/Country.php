@@ -9,4 +9,9 @@ class Country extends Model
 {
     use HasFactory;
     protected $fillable = ['countryName'];
+
+    public function plants()
+    {
+        $this->belongsToMany(Plant::class, 'plant_country', 'countryId', 'plantId');
+    }
 }

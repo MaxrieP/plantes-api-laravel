@@ -20,13 +20,20 @@ class PlantController extends Controller
             ->join('genuses', 'genuses.id', '=', 'plants.genusId')
             ->join('families', 'families.id', '=', 'plants.familyId')
             ->join('orders', 'orders.id', '=', 'plants.orderId')
-            ->join('countries', 'countries.id', '=', 'plants.orderId')
+            ->countries()
+            ->get()
+            ->toArray();
+
+        $countries = DB::table('countries')
+            ->join('plants', 'countries.plantId', '=', 'plants.id')
+            ->select('countries.*', 'plants.plantName')
             ->get()
             ->toArray();
 
         return response()->json([
             'status' => 'Success',
-            'data' => $plants
+            'data' => $plants,
+            'data' => $countries
         ]);
     }
 
@@ -75,8 +82,15 @@ class PlantController extends Controller
             'genusId' => $request->genusId,
             'familyId' => $request->familyId,
             'orderId' => $request->orderId,
-            'countryId' => $request->countryId,
         ]);
+
+        //Récupérer pays dans formulaire
+        $countries = $request->countryId;
+        for ($i=0; $i<count($countries); $i++)
+        {
+            $country = Country::find($countries[$i]);
+            $plant->country()->attach($country);
+        }
 
         return response()->json([
             'status' => 'Plante enregistrée',
